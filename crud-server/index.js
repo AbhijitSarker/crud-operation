@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
@@ -20,6 +20,7 @@ const client = new MongoClient(uri, {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
+
     }
 });
 
@@ -37,6 +38,14 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/users/:id', async (req, res) => {
+            id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+
+            const user = await userCollection.findOne(query);
+            res.send(user);
+        })
+
         app.post('/users', async (req, res) => {
             const user = req.body;
             console.log('New User:', user);
@@ -44,19 +53,31 @@ async function run() {
             res.send(result);
         })
 
+        app.put('/users/:id', async (req, res) => {
+            id = req.params.id;
+            const user = req.body;
+            console.log(user);
+
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedUser = {
+                $set: {
+                    name: user.name,
+                    email: user.name
+                }
+            }
+            const result = await userCollection.updateOne(filter, updatedUser, options);
+
+            res.send(result);
+        })
+
         app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
             console.log('Delete User:', id);
-
+            console.log('Delete User:', id);
             const query = { _id: new ObjectId(id) };
 
             const result = await userCollection.deleteOne(query);
-
-            // if (result.deletedCount === 1) {
-            //     console.log("Successfully deleted one document.");
-            // } else {
-            //     console.log("No documents matched the query. Deleted 0 documents.");
-            // }
 
             res.send(result);
 

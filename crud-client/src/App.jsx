@@ -12,7 +12,7 @@ function App() {
     console.log(user);
     // form.reset();
 
-    fetch('http://localhost:5000/users', {
+    fetch('http://localhost:4000/users', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -23,7 +23,6 @@ function App() {
       .then(data => {
         console.log(data);
         if (data.insertedId) {
-          alert('Inserted');
           form.reset()
         }
       })
